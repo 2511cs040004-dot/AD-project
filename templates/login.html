@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyst Authentication | AEGISTID Security Workspace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="ambient ambient-one"></div>
+<div class="ambient ambient-two"></div>
+<div class="grid-overlay"></div>
+
+<nav class="navbar">
+    <a class="brand" href="{{ url_for('home') }}">
+        <div class="brand-icon">🛡</div>
+        <div class="brand-text">
+            <h2>AEGISTID</h2>
+            <span>INTELLIGENT DOCUMENT SECURITY</span>
+        </div>
+    </a>
+    <div class="nav-actions">
+        <a href="{{ url_for('home') }}" class="btn-nav-secondary">← Back to Overview</a>
+    </div>
+</nav>
+
+<main class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon">🔒</div>
+            <h1>Analyst Workspace Sign-In</h1>
+            <p>Access the identity screening and document forensic console</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages" style="padding:0; margin-bottom: 18px;">
+                    {% for msg in messages %}
+                        <div class="flash-alert error">
+                            <span>⚠️</span> {{ msg }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('login', next=request.args.get('next', '')) }}" method="POST" novalidate id="login-form">
+            <div class="form-group">
+                <label for="username">Username or Email</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-control" 
+                    placeholder="analyst or analyst@aegistid.gov" 
+                    required 
+                    autocomplete="username"
+                    autofocus
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-control" 
+                    placeholder="Enter security password" 
+                    required 
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <button type="submit" class="btn-auth-primary">
+                Authenticate & Enter Console →
+            </button>
+        </form>
+
+        <div class="demo-login-box">
+            <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-bottom: 10px;">
+                EVALUATION & DEMO ACCESS
+            </span>
+            <a href="{{ url_for('login', demo=1) }}" class="btn-demo-login">
+                ⚡ 1-Click Demo Sign-in (Chief Analyst)
+            </a>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 14px;">
+                Need a new examiner profile? 
+                <a href="{{ url_for('register') }}" style="color: var(--cyan-primary); text-decoration: none; font-weight: 600;">
+                    Register here
+                </a>
+            </p>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Modern Web Guidance: Sync aria-invalid with CSS :user-invalid state
+    const syncAria = (el) => {
+        if (el.matches) {
+            el.setAttribute('aria-invalid', el.matches(':user-invalid') ? 'true' : 'false');
+        }
+    };
+    document.addEventListener('blur', (e) => syncAria(e.target), true);
+    document.addEventListener('input', (e) => {
+        if (e.target.hasAttribute && e.target.hasAttribute('aria-invalid')) syncAria(e.target);
+    });
+</script>
+
+</body>
+</html>

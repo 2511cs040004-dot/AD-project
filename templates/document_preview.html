@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-Resolution Credential Inspector | AEGISTID</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .inspector-viewport {
+            background: #010409;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 520px;
+            overflow: auto;
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .inspector-viewport img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            object-fit: contain;
+            transition: transform 0.25s ease;
+        }
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            background: rgba(10, 18, 33, 0.85);
+            padding: 6px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+        .zoom-btn {
+            background: none;
+            border: none;
+            color: var(--cyan-light);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+        .zoom-btn:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ambient ambient-one"></div>
+<div class="ambient ambient-two"></div>
+<div class="grid-overlay"></div>
+
+<!-- NAVIGATION -->
+<nav class="navbar">
+    <a class="brand" href="{{ url_for('dashboard') }}">
+        <div class="brand-icon">🛡</div>
+        <div class="brand-text">
+            <h2>AEGISTID</h2>
+            <span>INTELLIGENT DOCUMENT SECURITY</span>
+        </div>
+    </a>
+
+    <div class="nav-menu">
+        <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
+        <a href="{{ url_for('history') }}">📚 Audit History</a>
+        <a href="{{ url_for('view_verification', record_id=record['id']) }}">📋 View Report #{{ record['id'] }}</a>
+    </div>
+
+    <div class="nav-actions">
+        <a href="{{ url_for('view_verification', record_id=record['id']) }}" class="btn-nav-primary">
+            Back to Report →
+        </a>
+    </div>
+</nav>
+
+<main class="container">
+
+    <div class="page-header">
+        <div class="page-title">
+            <span class="panel-kicker">OPTICAL CREDENTIAL INSPECTOR</span>
+            <h1>🔍 {{ record['filename'] }}</h1>
+            <p>Verification Record #{{ record['id'] }} • Ingested on {{ record['verified_at'] }}</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ document_url }}" download class="btn-nav-secondary">
+                💾 Download Raw Image
+            </a>
+            <a href="{{ url_for('view_verification', record_id=record['id']) }}" class="btn-nav-primary">
+                View Full Audit Report
+            </a>
+        </div>
+    </div>
+
+    <!-- HIGH-RES VIEWPORT -->
+    <div class="inspector-viewport" id="viewport">
+        <img src="{{ document_url }}" id="inspect-img" alt="High-Resolution Credential">
+        
+        <div class="zoom-controls">
+            <button class="zoom-btn" onclick="zoomIn()" title="Zoom In">＋</button>
+            <button class="zoom-btn" onclick="zoomReset()" title="Reset Zoom">↺</button>
+            <button class="zoom-btn" onclick="zoomOut()" title="Zoom Out">－</button>
+        </div>
+    </div>
+
+    <!-- METADATA & HASH DETAILS -->
+    <div class="panel-card">
+        <div class="panel-header">
+            <div>
+                <span class="panel-kicker">CRYPTOGRAPHIC TRACKING</span>
+                <h2>🛡️ Document Cryptographic Seal</h2>
+            </div>
+            {% set st = (record['status'] or '')|upper %}
+            {% if 'HIGH' in st or 'INVALID' in st or 'ALERT' in st %}
+                <span class="status-badge danger">High Risk</span>
+            {% elif 'SUSPICIOUS' in st or 'PARTIAL' in st %}
+                <span class="status-badge warning">Suspicious</span>
+            {% else %}
+                <span class="status-badge success">Low Risk</span>
+            {% endif %}
+        </div>
+
+        <div class="sha256-strip" style="margin-bottom: 0;">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <strong style="color: var(--text-primary); font-size: 0.85rem;">SHA-256 DIGEST:</strong>
+                <span class="sha256-code">{{ record['sha256'] or 'Not computed' }}</span>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    let currentZoom = 1.0;
+    const img = document.getElementById("inspect-img");
+
+    function zoomIn() {
+        if (currentZoom < 3.0) {
+            currentZoom += 0.25;
+            img.style.transform = `scale(${currentZoom})`;
+        }
+    }
+
+    function zoomOut() {
+        if (currentZoom > 0.5) {
+            currentZoom -= 0.25;
+            img.style.transform = `scale(${currentZoom})`;
+        }
+    }
+
+    function zoomReset() {
+        currentZoom = 1.0;
+        img.style.transform = `scale(1.0)`;
+    }
+</script>
+
+</body>
+</html>

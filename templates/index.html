@@ -1,0 +1,700 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070b17">
+
+    <title>AEGISTID | Intelligent Document Security</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="home-page">
+
+<div class="ambient ambient-one"></div>
+<div class="ambient ambient-two"></div>
+<div class="grid-overlay"></div>
+
+<!-- NAVIGATION -->
+<nav class="navbar">
+
+    <a class="brand" href="{{ url_for('home') }}">
+        <div class="brand-icon">🛡</div>
+
+        <div class="brand-text">
+            <h2>AEGISTID</h2>
+            <span>INTELLIGENT DOCUMENT SECURITY</span>
+        </div>
+    </a>
+
+    <div class="nav-menu">
+        <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
+        <a href="#verification">⚡ Fast Intake</a>
+        <a href="#security">🛡️ Security Layers</a>
+        <a href="{{ url_for('history') }}">📚 Audit History</a>
+    </div>
+
+    <div class="nav-actions">
+        {% if current_user %}
+            <div class="user-badge">
+                <div class="user-avatar">{{ current_user['username'][:1].upper() }}</div>
+                <span>{{ current_user['full_name'] or current_user['username'] }}</span>
+            </div>
+            <a href="{{ url_for('dashboard') }}" class="btn-nav-primary">Console →</a>
+            <a href="{{ url_for('logout') }}" class="btn-nav-secondary">Sign Out ⎋</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="btn-nav-secondary">Sign In</a>
+            <a href="{{ url_for('login', demo=1) }}" class="btn-nav-primary">⚡ Demo Mode</a>
+        {% endif %}
+    </div>
+
+</nav>
+
+<main>
+
+    <!-- HERO AND UPLOAD SECTION -->
+    <section class="hero" id="verification">
+
+        <div class="hero-content">
+
+            <div class="eyebrow">
+                <span class="pulse-dot"></span>
+                NEXT-GENERATION DOCUMENT INTELLIGENCE
+            </div>
+
+            <h1>
+                Trust what you see.<br>
+                <span>Verify what you trust.</span>
+            </h1>
+
+            <p class="hero-description">
+                A multi-layered document authentication framework
+                combining OCR, MRZ analysis, image integrity checks
+                and security indicators to identify potentially
+                suspicious documents.
+            </p>
+
+            <div class="hero-actions">
+                <a href="#upload-panel" class="primary-link">
+                    Start verification <span>↗</span>
+                </a>
+
+                <a href="#security" class="secondary-link">
+                    Explore security layers ↓
+                </a>
+            </div>
+
+            <div class="feature-strip">
+
+                <div class="feature-item">
+                    <span class="feature-icon">⌕</span>
+                    <div>
+                        <strong>OCR ENGINE</strong>
+                        <small>Text extraction</small>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">▤</span>
+                    <div>
+                        <strong>MRZ ANALYSIS</strong>
+                        <small>Data consistency</small>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">◈</span>
+                    <div>
+                        <strong>IMAGE CHECKS</strong>
+                        <small>Integrity indicators</small>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="trust-note">
+                <span>✳</span>
+                Multiple checks. One consolidated assessment.
+            </div>
+
+        </div>
+
+        <!-- UPLOAD CARD -->
+        <div class="verification-card" id="upload-panel">
+
+            <div class="card-topline">
+
+                <div>
+                    <span class="card-kicker">SECURITY WORKSPACE</span>
+                    <h2>Verify a document</h2>
+                    <p>Submit an image to begin the analysis.</p>
+                </div>
+
+                <div class="card-shield">⬡</div>
+
+            </div>
+
+            <div class="upload-divider"></div>
+
+            <!-- FLASH MESSAGES -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- UPLOAD FORM -->
+            <form action="{{ url_for('upload_document') }}"
+                  method="POST"
+                  enctype="multipart/form-data"
+                  id="upload-form">
+
+                <!-- DOCUMENT IMAGE -->
+                <label class="upload-area" id="drop-zone">
+
+                    <input type="file"
+                           name="document"
+                           id="document-input"
+                           accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf"
+                           required>
+
+                    <div class="upload-visual" id="upload-visual">
+                        <div class="upload-cloud">↑</div>
+                    </div>
+
+                    <h3 id="upload-title">
+                        Drop your document here
+                    </h3>
+
+                    <p id="upload-description">
+                        or click to browse your device
+                    </p>
+
+                    <span class="format-chip">
+                        JPG <i>•</i> PNG <i>•</i> WEBP <i>•</i> PDF
+                    </span>
+
+                </label>
+
+                <div class="selected-file" id="file-name">
+                    <span class="file-status-dot"></span>
+                    No document selected
+                </div>
+
+                <!-- IMAGE PREVIEW BEFORE UPLOAD -->
+                <div class="preview-box" id="preview-box" hidden>
+
+                    <img id="document-preview"
+                         alt="Selected document preview">
+
+                    <div class="preview-info">
+                        <strong id="preview-name">Document image</strong>
+                        <span id="preview-size"></span>
+                    </div>
+
+                    <button type="button"
+                            id="remove-file"
+                            class="remove-file"
+                            aria-label="Remove selected document">
+                        ×
+                    </button>
+
+                </div>
+
+                <!-- OPTIONAL SIGNATURE -->
+                <div class="signature-heading">
+
+                    <div class="signature-symbol">✍</div>
+
+                    <div>
+                        <strong>
+                            Reference signature
+                            <span>OPTIONAL</span>
+                        </strong>
+
+                        <p>
+                            For comparison, if an authorized sample is available.
+                        </p>
+                    </div>
+
+                </div>
+
+                <label class="signature-upload" for="signature-input">
+
+                    <span class="signature-upload-icon">＋</span>
+
+                    <span id="signature-label">
+                        Choose signature image
+                    </span>
+
+                    <input type="file"
+                           name="signature"
+                           id="signature-input"
+                           accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+
+                </label>
+
+                <button type="button"
+                        id="remove-signature"
+                        class="remove-signature"
+                        hidden>
+                    Remove reference signature
+                </button>
+
+                <!-- VERIFY BUTTON -->
+                <button type="submit"
+                        class="verify-button"
+                        id="verify-button">
+
+                    <span class="button-icon">⌕</span>
+
+                    <span id="button-label">
+                        Start secure verification
+                    </span>
+
+                    <span class="button-arrow">→</span>
+
+                </button>
+
+            </form>
+
+            <div class="secure-note">
+                <span>♢</span>
+                Images are processed by the local verification application.
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- SECURITY FEATURES -->
+    <section class="security-section" id="security">
+
+        <div class="section-heading">
+
+            <span class="section-kicker">
+                THE VERIFICATION ENGINE
+            </span>
+
+            <h2>Security in multiple layers.</h2>
+
+            <p>
+                Each module examines a different document characteristic.
+            </p>
+
+        </div>
+
+        <div class="security-grid">
+
+            <article class="security-card">
+
+                <div class="security-card-top">
+                    <span>01 / DATA</span>
+                    <span>⌕</span>
+                </div>
+
+                <div class="security-icon">⌗</div>
+
+                <h3>OCR extraction</h3>
+
+                <p>
+                    Extracts readable text from the uploaded document image.
+                </p>
+
+                <div class="card-line"></div>
+
+            </article>
+
+            <article class="security-card">
+
+                <div class="security-card-top">
+                    <span>02 / STRUCTURE</span>
+                    <span>▤</span>
+                </div>
+
+                <div class="security-icon">▤</div>
+
+                <h3>MRZ analysis</h3>
+
+                <p>
+                    Examines machine-readable information and field consistency.
+                </p>
+
+                <div class="card-line"></div>
+
+            </article>
+
+            <article class="security-card">
+
+                <div class="security-card-top">
+                    <span>03 / INTEGRITY</span>
+                    <span>◈</span>
+                </div>
+
+                <div class="security-icon">◈</div>
+
+                <h3>Tamper indicators</h3>
+
+                <p>
+                    Looks for image differences that may warrant further inspection.
+                </p>
+
+                <div class="card-line"></div>
+
+            </article>
+
+            <article class="security-card">
+
+                <div class="security-card-top">
+                    <span>04 / ASSESSMENT</span>
+                    <span>⌘</span>
+                </div>
+
+                <div class="security-icon">⌘</div>
+
+                <h3>Risk assessment</h3>
+
+                <p>
+                    Combines module outputs into a consolidated risk assessment.
+                </p>
+
+                <div class="card-line"></div>
+
+            </article>
+
+        </div>
+
+        <!-- ANALYSIS PIPELINE -->
+        <div class="pipeline">
+
+            <div class="pipeline-heading">
+
+                <span class="section-kicker">
+                    ANALYSIS PIPELINE
+                </span>
+
+                <span class="pipeline-caption">
+                    A multi-stage verification workflow
+                </span>
+
+            </div>
+
+            <div class="pipeline-steps">
+
+                <div>
+                    <span>01</span>
+                    <strong>Upload</strong>
+                </div>
+
+                <i>→</i>
+
+                <div>
+                    <span>02</span>
+                    <strong>Preprocess</strong>
+                </div>
+
+                <i>→</i>
+
+                <div>
+                    <span>03</span>
+                    <strong>Extract</strong>
+                </div>
+
+                <i>→</i>
+
+                <div>
+                    <span>04</span>
+                    <strong>Analyze</strong>
+                </div>
+
+                <i>→</i>
+
+                <div>
+                    <span>05</span>
+                    <strong>Report</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about-section" id="about">
+
+        <div class="about-orb">⬡</div>
+
+        <div class="about-content">
+
+            <span class="section-kicker">
+                ABOUT AEGISTID
+            </span>
+
+            <h2>
+                More insight.<br>
+                <span>More informed decisions.</span>
+            </h2>
+
+            <p>
+                AEGISTID brings together document image processing,
+                text extraction, metadata inspection, hash generation
+                and verification indicators in a single interface.
+                Its results are intended to support further review,
+                not replace official document authentication.
+            </p>
+
+        </div>
+
+        <div class="about-side">
+
+            <div>
+                <span>01</span>
+                <strong>Layered analysis</strong>
+            </div>
+
+            <div>
+                <span>02</span>
+                <strong>Readable results</strong>
+            </div>
+
+            <div>
+                <span>03</span>
+                <strong>Security-focused design</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+
+    <a class="footer-brand" href="{{ url_for('home') }}">
+        ⬡ AEGISTID
+    </a>
+
+    <p>
+        Multi-Layered AI Document Authenticator &amp;
+        Fraud Mitigation Framework
+    </p>
+
+    <span>
+        © 2026 AEGISTID <i>•</i> Cyber Security
+    </span>
+
+</footer>
+
+<!-- JAVASCRIPT -->
+<script>
+const documentInput = document.getElementById("document-input");
+const dropZone = document.getElementById("drop-zone");
+const fileName = document.getElementById("file-name");
+const previewBox = document.getElementById("preview-box");
+const preview = document.getElementById("document-preview");
+const previewName = document.getElementById("preview-name");
+const previewSize = document.getElementById("preview-size");
+
+const signatureInput = document.getElementById("signature-input");
+const signatureLabel = document.getElementById("signature-label");
+const removeSignature = document.getElementById("remove-signature");
+
+const form = document.getElementById("upload-form");
+const verifyButton = document.getElementById("verify-button");
+const buttonLabel = document.getElementById("button-label");
+
+let previewUrl = null;
+
+const allowedTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+const maxFileSize = 10 * 1024 * 1024;
+
+
+function formatSize(bytes) {
+    if (bytes < 1024 * 1024) {
+        return (bytes / 1024).toFixed(1) + " KB";
+    }
+
+    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+}
+
+
+function updateFileName(file) {
+    fileName.replaceChildren();
+
+    const dot = document.createElement("span");
+    dot.className = "file-status-dot";
+
+    fileName.append(
+        dot,
+        document.createTextNode(" " + file.name)
+    );
+
+    fileName.classList.add("selected");
+}
+
+
+function displayFile(file) {
+    if (!file) return;
+
+    const isPdf = file.name.toLowerCase().endsWith(".pdf") || file.type === "application/pdf";
+    const isImage = file.type.startsWith("image/") || /\.(jpe?g|png|webp)$/i.test(file.name);
+
+    if (!isPdf && !isImage) {
+        alert("Please select a JPG, JPEG, PNG, WEBP image or PDF document.");
+        documentInput.value = "";
+        return;
+    }
+
+    if (file.size > maxFileSize) {
+        alert("Please select an image smaller than 10 MB.");
+        documentInput.value = "";
+        return;
+    }
+
+    if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+    }
+
+    previewUrl = URL.createObjectURL(file);
+
+    preview.src = previewUrl;
+    previewName.textContent = file.name;
+    previewSize.textContent = formatSize(file.size);
+
+    previewBox.hidden = false;
+
+    updateFileName(file);
+
+    document.getElementById("upload-title").textContent =
+        "Document ready";
+
+    document.getElementById("upload-description").textContent =
+        "Review the preview before starting verification.";
+}
+
+
+documentInput.addEventListener("change", () => {
+    displayFile(documentInput.files[0]);
+});
+
+
+document.getElementById("remove-file").addEventListener("click", () => {
+    documentInput.value = "";
+
+    previewBox.hidden = true;
+    preview.removeAttribute("src");
+
+    fileName.textContent = "No document selected";
+    fileName.classList.remove("selected");
+
+    document.getElementById("upload-title").textContent =
+        "Drop your document here";
+
+    document.getElementById("upload-description").textContent =
+        "or click to browse your device";
+
+    if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        previewUrl = null;
+    }
+});
+
+
+signatureInput.addEventListener("change", () => {
+    const file = signatureInput.files[0];
+
+    if (!file) return;
+
+    if (!allowedTypes.includes(file.type)) {
+        alert("Please select a JPG, JPEG, or PNG signature image.");
+        signatureInput.value = "";
+        return;
+    }
+
+    if (file.size > maxFileSize) {
+        alert("The signature image must be smaller than 10 MB.");
+        signatureInput.value = "";
+        return;
+    }
+
+    signatureLabel.textContent = file.name;
+    removeSignature.hidden = false;
+});
+
+
+removeSignature.addEventListener("click", () => {
+    signatureInput.value = "";
+    signatureLabel.textContent = "Choose signature image";
+    removeSignature.hidden = true;
+});
+
+
+["dragenter", "dragover"].forEach(eventName => {
+    dropZone.addEventListener(eventName, event => {
+        event.preventDefault();
+        dropZone.classList.add("drag-over");
+    });
+});
+
+
+["dragleave", "drop"].forEach(eventName => {
+    dropZone.addEventListener(eventName, event => {
+        event.preventDefault();
+        dropZone.classList.remove("drag-over");
+    });
+});
+
+
+dropZone.addEventListener("drop", event => {
+    const file = event.dataTransfer.files[0];
+
+    if (!file) return;
+
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+
+    documentInput.files = transfer.files;
+
+    displayFile(file);
+});
+
+
+form.addEventListener("submit", event => {
+    if (!documentInput.files.length) {
+        event.preventDefault();
+        alert("Please select a document image first.");
+        return;
+    }
+
+    const file = documentInput.files[0];
+
+    if (!allowedTypes.includes(file.type) || file.size > maxFileSize) {
+        event.preventDefault();
+        alert("Please select a valid JPG, JPEG, or PNG image under 10 MB.");
+        return;
+    }
+
+    verifyButton.disabled = true;
+    buttonLabel.textContent = "Analyzing document...";
+    verifyButton.classList.add("loading");
+});
+
+
+window.addEventListener("beforeunload", () => {
+    if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+    }
+});
+</script>
+
+</body>
+</html>

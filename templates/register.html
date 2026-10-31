@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyst Registration | AEGISTID Security Workspace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="ambient ambient-one"></div>
+<div class="ambient ambient-two"></div>
+<div class="grid-overlay"></div>
+
+<nav class="navbar">
+    <a class="brand" href="{{ url_for('home') }}">
+        <div class="brand-icon">🛡</div>
+        <div class="brand-text">
+            <h2>AEGISTID</h2>
+            <span>INTELLIGENT DOCUMENT SECURITY</span>
+        </div>
+    </a>
+    <div class="nav-actions">
+        <a href="{{ url_for('login') }}" class="btn-nav-secondary">← Sign In</a>
+    </div>
+</nav>
+
+<main class="auth-wrapper">
+    <div class="auth-card" style="max-width: 480px;">
+        <div class="auth-header">
+            <div class="auth-icon" style="background: linear-gradient(135deg, var(--teal-accent), #0284c7);">🛡️</div>
+            <h1>Register Security Officer</h1>
+            <p>Create an authorized credential screening and forensic account</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages" style="padding:0; margin-bottom: 18px;">
+                    {% for msg in messages %}
+                        <div class="flash-alert error">
+                            <span>⚠️</span> {{ msg }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('register') }}" method="POST" novalidate id="register-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-control" 
+                    placeholder="e.g. examiner_john" 
+                    required 
+                    autocomplete="username"
+                    minlength="3"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="full_name">Full Legal / Officer Name</label>
+                <input 
+                    type="text" 
+                    id="full_name" 
+                    name="full_name" 
+                    class="form-control" 
+                    placeholder="e.g. Johnathan Vance" 
+                    required 
+                    autocomplete="name"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email">Official Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-control" 
+                    placeholder="examiner@agency.gov" 
+                    required 
+                    autocomplete="email"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="role">Examiner Role / Unit</label>
+                <select id="role" name="role" class="form-control">
+                    <option value="Senior Forensic Examiner">Senior Forensic Examiner</option>
+                    <option value="Border Security Inspector">Border Security Inspector</option>
+                    <option value="Identity Compliance Auditor">Identity Compliance Auditor</option>
+                    <option value="Fraud Investigator">Fraud Investigator</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Security Password</label>
+                <span class="field-hint">Must contain at least 8 characters</span>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    class="form-control" 
+                    placeholder="Create strong password" 
+                    required 
+                    minlength="8"
+                    autocomplete="new-password"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input 
+                    type="password" 
+                    id="confirm_password" 
+                    name="confirm_password" 
+                    class="form-control" 
+                    placeholder="Repeat password" 
+                    required 
+                    minlength="8"
+                    autocomplete="new-password"
+                >
+            </div>
+
+            <button type="submit" class="btn-auth-primary" style="margin-top: 14px;">
+                Complete Registration & Access Workspace →
+            </button>
+        </form>
+
+        <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 20px;">
+            Already have an active profile? 
+            <a href="{{ url_for('login') }}" style="color: var(--cyan-primary); text-decoration: none; font-weight: 600;">
+                Sign in here
+            </a>
+        </p>
+    </div>
+</main>
+
+<script>
+    // Modern Web Guidance: Sync aria-invalid with CSS :user-invalid state
+    const syncAria = (el) => {
+        if (el.matches) {
+            el.setAttribute('aria-invalid', el.matches(':user-invalid') ? 'true' : 'false');
+        }
+    };
+    document.addEventListener('blur', (e) => syncAria(e.target), true);
+    document.addEventListener('input', (e) => {
+        if (e.target.hasAttribute && e.target.hasAttribute('aria-invalid')) syncAria(e.target);
+    });
+</script>
+
+</body>
+</html>
